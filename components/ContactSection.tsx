@@ -13,9 +13,9 @@ const ContactSections = async ({ id }: { id: string }) => {
       <div className="max-w-xl flex flex-col gap-10">
         <h1 className="lg:text-4xl text-lg font-semibold">Contact me</h1>
         <h2 className="lg:text-2xl font-semibold">
-          If you have a project idea, need help, would like to make an enquiry
+          {`If you have a project idea, need help, would like to make an enquiry
           or say hello just select one of the following options. I'm currently
-          open to work and looking forward to new collaborations.
+          open to work and looking forward to new collaborations.`}
         </h2>
         <div className="flex flex-col gap-5 text-sm lg:text-xl">
           <a

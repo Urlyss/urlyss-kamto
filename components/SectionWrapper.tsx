@@ -10,4 +10,5 @@ const SectionWrapper = React.forwardRef<
   </section>
 ));
 
+SectionWrapper.displayName = "SectionWrapper"
 export default SectionWrapper;

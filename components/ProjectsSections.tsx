@@ -10,8 +10,8 @@ const ProjectsSections = async ({ id }: { id: string }) => {
       <div className="max-w-xl flex flex-col gap-4 lg:px-20 px-4">
         <h1 className="lg:text-4xl font-semibold">Projects</h1>
         <h2 className="lg:text-2xl font-semibold">
-          Swipe or drag below to see a small selection of projects I've worked
-          on.
+          {`Swipe or drag below to see a small selection of projects I've worked
+          on.`}
         </h2>
       </div>
       <ProjectsCarrousel projects={projectContent}/>
