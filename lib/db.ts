@@ -141,19 +141,19 @@ export const getWorks = async () => {
       name: "Summa",
       icon: "https://placehold.co/400x400?text=summa",
       link: "https://summa-explorer.vercel.app/",
-      description: "A web app that allows users to navigate and read the Summa Theologica by Thomas Aquinas, providing easy access to its sections, questions, and articles.",
+      description: "An app that allows users to navigate and read the Summa Theologica by Thomas Aquinas, providing easy access to its sections, questions, and articles.",
     },
     {
       name: "Covertune",
       icon: "https://placehold.co/400x400?text=covertune",
       link: "https://covertune.vercel.app/",
-      description: "A web app that allows users to discover music by browsing album cover art, with category selection, detailed album information, and search functionality.",
+      description: "An app that allows users to discover music by browsing album cover art, with category selection, detailed album information, and search functionality.",
     },
     {
       name: "CoordId",
       icon: "https://placehold.co/400x400?text=coordid",
       link: "https://coordid.vercel.app/",
-      description: "A web app created for African areas that converts geographic coordinates into a unique ID, offering reverse lookup, map localization, and solving the address challenge in regions without formal addresses.",
+      description: "An app created for African areas that converts geographic coordinates into a unique ID, solving the address challenge in regions without formal addresses.",
     }
   ]
   try {

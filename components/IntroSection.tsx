@@ -15,7 +15,7 @@ const IntroSection = async ({
   const introContent = await getIntro()
   const socialContent = await getSocials()
   return (
-    <IntroComponentAnimation className="lg:p-16 p-7 flex flex-col justify-between items-start gap-5 h-full">
+    <IntroComponentAnimation className="lg:p-16 p-7 flex flex-col justify-between items-start gap-5 h-full pb-20">
       <IntroTextAnimation className="relative">
         <Menu
           sections={sections}
