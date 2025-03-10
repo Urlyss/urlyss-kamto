@@ -86,6 +86,31 @@ const NavText = ({
     },
   };
 
+  const handleNavigation = (id: string) => {
+    toggleMenu();
+    const section = document.getElementById(id);
+    const stickyElements = document.querySelectorAll('.sticky');
+    
+    setTimeout(() => { 
+      if (section && stickyElements.length > 0) {
+        // Remove sticky class from all elements
+        stickyElements.forEach(element => {
+          element.classList.remove('sticky');
+        });
+        
+        // Scroll to section
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Add sticky class back to all elements after animation
+        setTimeout(() => {
+          stickyElements.forEach(element => {
+            element.classList.add('sticky');
+          });
+        }, 1000);
+      }
+    }, 400);
+};
+
   return (
     <div className="flex justify-between items-center flex-col pt-20 pb-8 px-8">
       <motion.div
@@ -104,7 +129,8 @@ const NavText = ({
           >
             <motion.div className="relative" variants={menuLinkItemVariants}>
               <Link
-              href={`/#${link.id}`}
+              href={`#${link.id}`}
+              onClick={()=>{handleNavigation(link.id)}}
                 className="hover:underline menu-link text-xl py-4 lg:py-1 lg:text-3xl font-normal tracking-[-0.02em] leading-[85%]"
               >
                 {link.label}

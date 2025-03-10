@@ -9,6 +9,7 @@ import PictureSection from "@/components/PictureSection";
 
 export default async function Home() {
   const sections = [
+    { id: "home", label: "Home", component: PictureSection },
     { id: "about", label: "About Me", component: AboutSection },
     {
       id: "specialization",
@@ -25,7 +26,6 @@ export default async function Home() {
         <IntroSection sections={sections.map(sec=>{return {id:sec.id,label:sec.label}})} />
       </IntroAnimation>
       <div className="lg:w-[50%] lg:ml-[50%] z-10 relative">
-        <PictureSection />
         {sections.map((sec, ind) => (
           <sec.component key={ind} id={sec.id} />
         ))}

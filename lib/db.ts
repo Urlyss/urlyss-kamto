@@ -7,7 +7,7 @@ import {
   TSpecialization,
   TTool,
   TWork,
-} from "./utils";
+} from "./types";
 
 export class NotionClient {
   private static instance: NotionClient;
@@ -40,7 +40,7 @@ export const getSocials = async () => {
     mail: "odusseuskamto@gmail.com",
     phone: "+237690760442",
     resume:
-      "https://drive.google.com/file/d/19lkM3afivegnzkyVdjCT16viw0qbCZjo/view?usp=embed_facebook",
+      "https://drive.google.com/file/d/1Fp1K1C_8kQZW8KJ7gzn59Q4itP6SOiYS/view?usp=drivesdk",
   };
   try {
     const socialList:TSocial = {...defaultSocialList}
@@ -140,20 +140,23 @@ export const getWorks = async () => {
     {
       name: "Summa",
       icon: "https://placehold.co/400x400?text=summa",
-      link: "https://summa-explorer.vercel.app/",
-      description: "An app that allows users to navigate and read the Summa Theologica by Thomas Aquinas, providing easy access to its sections, questions, and articles.",
+      link: "https://summa-navigator.vercel.app/",
+      description: "An app that allows users to navigate and read the Summa Theologica by Thomas Aquinas, providing easy access to its sections, questions, and articles.Engage with an AI-powered assistant that helps you understand complex theological concepts.",
+      tech:["nextjs"]
     },
     {
       name: "Covertune",
       icon: "https://placehold.co/400x400?text=covertune",
       link: "https://covertune.vercel.app/",
       description: "An app that allows users to discover music by browsing album cover art, with category selection, detailed album information, and search functionality.",
+      tech:["nextjs"]
     },
     {
       name: "CoordId",
       icon: "https://placehold.co/400x400?text=coordid",
       link: "https://coordid.vercel.app/",
       description: "An app created for African areas that converts geographic coordinates into a unique ID, solving the address challenge in regions without formal addresses.",
+      tech:["nextjs"]
     }
   ]
   try {
@@ -167,6 +170,7 @@ export const getWorks = async () => {
       icon: "",
       link: "",
       description: "",
+      tech:['']
     };
     //@ts-ignore
     Object.entries(work.properties).forEach(([propertyName, propertyValue]) => {
@@ -198,6 +202,12 @@ export const getWorks = async () => {
             //@ts-ignore
             .map((rt) => rt.plain_text)
             .join("\n");
+          break;
+          case "tech":
+          //@ts-ignore
+          finalWork["tech"] = propertyValue.multi_select
+            //@ts-ignore
+            .map((rt) => rt.name)
           break;
         default:
           break;

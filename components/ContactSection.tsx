@@ -17,20 +17,24 @@ const ContactSections = async ({ id }: { id: string }) => {
           or say hello just select one of the following options. I'm currently
           open to work and looking forward to new collaborations.`}
         </h2>
-        <div className="flex flex-col gap-5 text-sm lg:text-xl">
-          <a
+        <div className="space-y-5 text-sm lg:text-xl">
+          <div>
+          <Link
             className="underline hover:text-primary"
             href={`mailto:${socialContent.mail}`}
           >
             Send me a mail now
-          </a>
-          or
-          <a
-            className="underline hover:text-primary"
-            href={`tel:${socialContent.phone}`}
-          >
-            Call me
-          </a>
+          </Link>
+          </div>
+          <div>or</div>
+          <div>
+            <Link
+              className="underline hover:text-primary"
+              href={`tel:${socialContent.phone}`}
+            >
+              Call me
+            </Link>
+          </div>
         </div>
       </div>
     </SectionWrapper>
