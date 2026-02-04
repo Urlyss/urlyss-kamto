@@ -1,4 +1,3 @@
-import { Client } from "@notionhq/client";
 import {
   TAbout,
   TExperience,
@@ -8,29 +7,10 @@ import {
   TTool,
   TWork,
 } from "./types";
+import { getConvexServerClient } from "@/convex/client";
+import { api } from "@/convex/_generated/api";
 
-export class NotionClient {
-  private static instance: NotionClient;
-  private notion: Client;
-
-  private constructor() {
-    this.notion = new Client({ auth: process.env.NOTION_API_KEY });
-  }
-
-  public static getInstance(): NotionClient {
-    if (!NotionClient.instance) {
-      NotionClient.instance = new NotionClient();
-    }
-    return NotionClient.instance;
-  }
-
-  public async queryDatabase(databaseId: string) {
-      const response = await this.notion.databases.query({
-        database_id: databaseId,
-      });
-      return response;
-  }
-}
+const convexClient = getConvexServerClient();
 
 export const getSocials = async () => {
   const defaultSocialList:TSocial = {
@@ -43,23 +23,19 @@ export const getSocials = async () => {
       "https://drive.google.com/file/d/1Fp1K1C_8kQZW8KJ7gzn59Q4itP6SOiYS/view?usp=drivesdk",
   };
   try {
-    const socialList:TSocial = {...defaultSocialList}
-  const notionClient = NotionClient.getInstance();
-  const databaseId = process.env.NOTION_SOCIAL_DATABASE_ID || "";
-  const response = await notionClient.queryDatabase(databaseId);
-  response?.results.forEach((ab) => {
-    //@ts-ignore
-    Object.entries(ab.properties).forEach(([propertyName, propertyValue]) => {
-      //@ts-ignore
-      socialList[propertyName] = propertyValue.rich_text && propertyValue.rich_text
-          .map(
-            //@ts-ignore
-            (cat) => cat.plain_text
-          )
-          .join("\n");
-    });
-  });
-  return socialList;
+    const socialDoc = await convexClient.query(api.db.getSocials, {});
+    if (!socialDoc) {
+      return defaultSocialList;
+    }
+    const socialList: TSocial = {
+      github: socialDoc.github ?? defaultSocialList.github,
+      linkedin: socialDoc.linkedin ?? defaultSocialList.linkedin,
+      x: socialDoc.x ?? defaultSocialList.x,
+      mail: socialDoc.mail ?? defaultSocialList.mail,
+      phone: socialDoc.phone ?? defaultSocialList.phone,
+      resume: socialDoc.resume ?? defaultSocialList.resume,
+    };
+    return socialList;
   } catch (error) {
     console.error(error);
     return defaultSocialList
@@ -74,26 +50,17 @@ export const getIntro = async () => {
     header: "Hey 👋, I'm a creative frontend and mobile developer. ",
   };
   try {
-    const aboutSection = { ...defaultIntroSection };
-    const notionClient = NotionClient.getInstance();
-  const databaseId = process.env.NOTION_INTRO_DATABASE_ID || "";
-  const response = await notionClient.queryDatabase(databaseId);
-
-  response?.results.forEach((ab) => {
-    //@ts-ignore
-    Object.entries(ab.properties).forEach(([propertyName, propertyValue]) => {
-      //@ts-ignore
-      aboutSection[propertyName] = propertyValue.rich_text && propertyValue.rich_text
-          .map(
-            //@ts-ignore
-            (cat) => {
-              return cat.plain_text.split("\n");
-            }
-          )
-          .join("\n");
-    });
-  });
-  return aboutSection;
+    const introDoc = await convexClient.query(api.db.getIntro, {});
+    if (!introDoc) {
+      return defaultIntroSection;
+    }
+    const aboutSection: TIntro = {
+      picture: introDoc.picture ?? defaultIntroSection.picture,
+      about_me: introDoc.about_me ?? defaultIntroSection.about_me,
+      description: introDoc.description ?? defaultIntroSection.description,
+      header: introDoc.header ?? defaultIntroSection.header,
+    };
+    return aboutSection;
   } catch (error) {
     console.error(error);
     return defaultIntroSection
@@ -109,26 +76,17 @@ export const getExperiences = async () => {
     },
   ];
   try {
-    const experiencesList: TExperience[] = [];
-  const notionClient = NotionClient.getInstance();
-  const databaseId = process.env.NOTION_EXPERIENCE_DATABASE_ID || "";
-  const response = await notionClient.queryDatabase(databaseId);
-  response?.results.forEach((ab) => {
-    const exp = { company: "", job_title: "", dates: "", link: "" };
-    //@ts-ignore
-    Object.entries(ab.properties).forEach(([propertyName, propertyValue]) => {
-      //@ts-ignore
-      exp[propertyName] = propertyValue.rich_text && propertyValue.rich_text
-          .map(
-            //@ts-ignore
-            (cat) => cat.plain_text
-          )
-          .join("\n");
-    });
-    experiencesList.push(exp);
-  });
-
-  return experiencesList;
+    const experiences = await convexClient.query(api.db.getExperiences, {});
+    if (!experiences || experiences.length === 0) {
+      return defaultExperiencesList;
+    }
+    const experiencesList: TExperience[] = experiences.map((e: any) => ({
+      company: e.company,
+      job_title: e.job_title,
+      dates: e.dates,
+      link: e.link,
+    }));
+    return experiencesList;
   } catch (error) {
     console.error(error);
     return defaultExperiencesList
@@ -140,82 +98,38 @@ export const getWorks = async () => {
     {
       name: "Summa",
       icon: "https://placehold.co/400x400?text=summa",
-      link: "https://summa-navigator.vercel.app/",
+      link: "https://summa-navigator.urlyss.dev/",
       description: "An app that allows users to navigate and read the Summa Theologica by Thomas Aquinas, providing easy access to its sections, questions, and articles.Engage with an AI-powered assistant that helps you understand complex theological concepts.",
       tech:["nextjs"]
     },
     {
       name: "Covertune",
       icon: "https://placehold.co/400x400?text=covertune",
-      link: "https://covertune.vercel.app/",
+      link: "https://covertune.urlyss.dev/",
       description: "An app that allows users to discover music by browsing album cover art, with category selection, detailed album information, and search functionality.",
       tech:["nextjs"]
     },
     {
       name: "CoordId",
       icon: "https://placehold.co/400x400?text=coordid",
-      link: "https://coordid.vercel.app/",
+      link: "https://coordid.urlyss.dev/",
       description: "An app created for African areas that converts geographic coordinates into a unique ID, solving the address challenge in regions without formal addresses.",
       tech:["nextjs"]
     }
   ]
   try {
-    const workList: TWork[] = [];
-    const databaseId = process.env.NOTION_WORK_DATABASE_ID || "";
-  const notionClient = NotionClient.getInstance();
-  const response = await notionClient.queryDatabase(databaseId);
-  response?.results.forEach((work) => {
-    const finalWork = {
-      name: "",
-      icon: "",
-      link: "",
-      description: "",
-      tech:['']
-    };
-    //@ts-ignore
-    Object.entries(work.properties).forEach(([propertyName, propertyValue]) => {
-      switch (propertyName) {
-        case "icon":
-          //@ts-ignore
-          finalWork["icon"] = propertyValue.rich_text
-            //@ts-ignore
-            .map((rt) => rt.plain_text)
-            .join("\n");
-          break;
-        case "link":
-          //@ts-ignore
-          finalWork["link"] = propertyValue.rich_text
-            //@ts-ignore
-            .map((rt) => rt.plain_text)
-            .join("\n");
-          break;
-        case "name":
-          //@ts-ignore
-          finalWork["name"] = propertyValue.title
-            //@ts-ignore
-            .map((rt) => rt.plain_text)
-            .join("\n");
-          break;
-        case "description":
-          //@ts-ignore
-          finalWork["description"] = propertyValue.rich_text
-            //@ts-ignore
-            .map((rt) => rt.plain_text)
-            .join("\n");
-          break;
-          case "tech":
-          //@ts-ignore
-          finalWork["tech"] = propertyValue.multi_select
-            //@ts-ignore
-            .map((rt) => rt.name)
-          break;
-        default:
-          break;
-      }
-    });
-    workList.push(finalWork);
-  });
-  return workList;
+    const works = await convexClient.query(api.db.getWorks, {});
+    if (!works || works.length === 0) {
+      return defaultWorkList;
+    }
+    const workList: TWork[] = works.map((w: any) => ({
+      name: w.name,
+      icon: w.icon,
+      link: w.link,
+      description: w.description,
+      tech: Array.isArray(w.tech) ? w.tech : [],
+    }));
+    return workList;
   } catch (error) {
     console.error(error);
     return defaultWorkList
@@ -241,40 +155,15 @@ export const getAbout = async () => {
     },
   ]
   try {
-    const aboutList: TAbout[] = [];
-  const databaseId = process.env.NOTION_ABOUT_DATABASE_ID || "";
-  const notionClient = NotionClient.getInstance();
-  const response = await notionClient.queryDatabase(databaseId);
-  response?.results.forEach((work) => {
-    const finalAbout = { title: "", description: "" };
-    //@ts-ignore
-    Object.entries(work.properties).forEach(([propertyName, propertyValue]) => {
-      switch (propertyName) {
-        case "title":
-          //@ts-ignore
-          finalAbout["title"] = propertyValue.title
-          //@ts-ignore
-          .map((rt) => rt.plain_text)
-          .join("\n");
-            break;
-        case "description":
-          //@ts-ignore
-          finalAbout["description"] = propertyValue.rich_text && propertyValue.rich_text
-          .map(
-            //@ts-ignore
-            (cat) => {
-              return cat.plain_text.split("\n");
-            }
-          )
-          .join("\n");
-          break;
-        default:
-          break;
-      }
-    });
-    aboutList.push(finalAbout);
-  });
-  return aboutList;
+    const aboutDocs = await convexClient.query(api.db.getAbout, {});
+    if (!aboutDocs || aboutDocs.length === 0) {
+      return defaultAboutList;
+    }
+    const aboutList: TAbout[] = aboutDocs.map((a: any) => ({
+      title: a.title,
+      description: a.description,
+    }));
+    return aboutList;
   } catch (error) {
     console.error(error);
     return defaultAboutList
@@ -289,40 +178,15 @@ export const getTools = async () => {
     {title:"Platforms",description:"Google Cloud Platform"},
   ]
   try {
-    const toolList: TTool[] = [];
-  const databaseId = process.env.NOTION_TOOL_DATABASE_ID || "";
-  const notionClient = NotionClient.getInstance();
-  const response = await notionClient.queryDatabase(databaseId);
-  response?.results.forEach((work) => {
-    const finalTool = { title: "", description: "" };
-    //@ts-ignore
-    Object.entries(work.properties).forEach(([propertyName, propertyValue]) => {
-      switch (propertyName) {
-        case "title":
-          //@ts-ignore
-          finalTool["title"] = propertyValue.title
-          //@ts-ignore
-          .map((rt) => rt.plain_text)
-          .join("\n");
-          break;
-        case "description":
-          //@ts-ignore
-          finalTool["description"] = propertyValue.rich_text && propertyValue.rich_text
-          .map(
-            //@ts-ignore
-            (cat) => {
-              return cat.plain_text.split("\n");
-            }
-          )
-          .join("\n");
-          break;
-        default:
-          break;
-      }
-    });
-    toolList.push(finalTool);
-  });
-  return toolList;
+    const toolDocs = await convexClient.query(api.db.getTools, {});
+    if (!toolDocs || toolDocs.length === 0) {
+      return defaultToolList;
+    }
+    const toolList: TTool[] = toolDocs.map((t: any) => ({
+      title: t.title,
+      description: t.description,
+    }));
+    return toolList;
   } catch (error) {
     console.error(error);
     return defaultToolList
@@ -336,40 +200,17 @@ export const getSpecialization = async () => {
     {title:"Growth Marketing",description:"With a keen interest in growth marketing, I apply technology, data, and performance metrics to secure customers and accelerate business growth."},
   ]
   try {
-    const specializationList: TSpecialization[] = [];
-  const databaseId = process.env.NOTION_SPECIALIZATION_DATABASE_ID || "";
-  const notionClient = NotionClient.getInstance();
-  const response = await notionClient.queryDatabase(databaseId);
-  response?.results.forEach((work) => {
-    const finalSpecialization = { title: "", description: "" };
-    //@ts-ignore
-    Object.entries(work.properties).forEach(([propertyName, propertyValue]) => {
-      switch (propertyName) {
-        case "title":
-          //@ts-ignore
-          finalSpecialization["title"] = propertyValue.title
-          //@ts-ignore
-          .map((rt) => rt.plain_text)
-          .join("\n");
-          break;
-        case "description":
-          //@ts-ignore
-          finalSpecialization["description"] = propertyValue.rich_text && propertyValue.rich_text
-          .map(
-            //@ts-ignore
-            (cat) => {
-              return cat.plain_text.split("\n");
-            }
-          )
-          .join("\n");
-          break;
-        default:
-          break;
-      }
-    });
-    specializationList.push(finalSpecialization);
-  });
-  return specializationList;
+    const specializationDocs = await convexClient.query(api.db.getSpecialization,{});
+    if (!specializationDocs || specializationDocs.length === 0) {
+      return defaultSpecialization;
+    }
+    const specializationList: TSpecialization[] = specializationDocs.map(
+      (s: any) => ({
+        title: s.title,
+        description: s.description,
+      })
+    );
+    return specializationList;
   } catch (error) {
     console.error(error);
     return defaultSpecialization
